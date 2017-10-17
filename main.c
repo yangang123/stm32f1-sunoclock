@@ -18,6 +18,9 @@ _setup_clock(void) {
 	while ((RCC_CONFIG & RCC_CONFIG_SYSCLK_STATUS_MASK) != RCC_CONFIG_SYSCLK_STATUS_HSE) {}
 
 	RCC_CLOCK &= ~(RCC_CLOCK_HSI_ENABLE);
+	
+	RCC_BACKUPCONTROL |= RCC_BACKUPCONTROL_LSEENABLE;
+	while ((RCC_BACKUPCONTROL & RCC_BACKUPCONTROL_LSEREADY) == 0) {}
 
 	u32 config = RCC_CONFIG;
 	config = (config & ~(RCC_CONFIG_APB2_MASK)) | RCC_CONFIG_APB2_DIV1;
@@ -26,6 +29,7 @@ _setup_clock(void) {
 	RCC_CONFIG = config;
 }
 
+/* depends on _setup_clock() */
 static void
 _setup_led(void) {
 	RCC_APB2ENABLE |= RCC_APB2ENABLE_GPIOC;  /* see RM0008, figure 8 for clock tree diagram */
@@ -38,6 +42,7 @@ _setup_led(void) {
 	*GPIOC_OUTPUT &= ~(1 << 13);
 }
 
+/* depends on _setup_clock() */
 static void
 _setup_timer6(void) {
 	RCC_APB1ENABLE |= RCC_APB1ENABLE_TIMER6;  /* see RM0008, figure 11 for clock tree diagram */
@@ -56,12 +61,10 @@ _setup_timer6(void) {
 	*TIMER6_CONTROL1 |= (TIMER6_CONTROL1_ENABLE);
 }
 
+/* depends on _setup_clock() */
 static void
 _setup_rtc(void) {
 	RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
-
-	RCC_BACKUPCONTROL |= RCC_BACKUPCONTROL_LSEENABLE;
-	while ((RCC_BACKUPCONTROL & RCC_BACKUPCONTROL_LSEREADY) == 0) {}
 
 	u32 control = RCC_BACKUPCONTROL;
 	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
