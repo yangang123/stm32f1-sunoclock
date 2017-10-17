@@ -64,14 +64,17 @@ _setup_timer6(void) {
 /* depends on _setup_clock() */
 static void
 _setup_rtc(void) {
+	/* RM0008, 18.1:
+		* enable the power and backup interface clocks by setting the PWREN and BKPEN bits in the RCC_APB1ENR register
+		* set the DBP bit the Power Control Register (PWR_CR) to enable access to the Backup registers and RTC
+	*/
 	RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
+	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
 
 	u32 control = RCC_BACKUPCONTROL;
 	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
 	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
 	RCC_BACKUPCONTROL = control;
-
-	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
 }
 
 void
