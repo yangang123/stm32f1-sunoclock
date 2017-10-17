@@ -2,6 +2,7 @@
 #include <io/rcc.h>
 #include <io/gpio.h>
 #include <io/timer6.h>
+#include <io/power.h>
 
 static const size HSE_FREQ = 8000000;  /* aka HSE OSC */
 static const size LSE_FREQ =   32768;  /* aka LSE OSC */
@@ -55,11 +56,27 @@ _setup_timer6(void) {
 	*TIMER6_CONTROL1 |= (TIMER6_CONTROL1_ENABLE);
 }
 
+static void
+_setup_rtc(void) {
+	RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
+
+	RCC_BACKUPCONTROL |= RCC_BACKUPCONTROL_LSEENABLE;
+	while ((RCC_BACKUPCONTROL & RCC_BACKUPCONTROL_LSEREADY) == 0) {}
+
+	u32 control = RCC_BACKUPCONTROL;
+	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
+	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
+	RCC_BACKUPCONTROL = control;
+
+	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
+}
+
 void
 main(void) {
 	_setup_clock();
 	_setup_led();
 	_setup_timer6();
+	_setup_rtc();
 
 	*GPIOC_OUTPUT &= ~(1 << 13);
 	for (size i=0; i<100000; i++) cortexm_noop();
