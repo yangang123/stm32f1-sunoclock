@@ -18,7 +18,7 @@ _setup_clock(void) {
 	while ((RCC_CONFIG & RCC_CONFIG_SYSCLK_STATUS_MASK) != RCC_CONFIG_SYSCLK_STATUS_HSE) {}
 
 	RCC_CLOCK &= ~(RCC_CLOCK_HSI_ENABLE);
-	
+
 	u32 config = RCC_CONFIG;
 	config = (config & ~(RCC_CONFIG_APB2_MASK)) | RCC_CONFIG_APB2_DIV1;
 	config = (config & ~(RCC_CONFIG_APB1_MASK)) | RCC_CONFIG_APB1_DIV1;
@@ -62,8 +62,9 @@ _setup_timer6(void) {
 static void
 _setup_rtc(void) {
 	/* RM0008, 18.1:
-		* enable the power and backup interface clocks by setting the PWREN and BKPEN bits in the RCC_APB1ENR register
-		* set the DBP bit the Power Control Register (PWR_CR) to enable access to the Backup registers and RTC
+		To enable access to the Backup registers and the RTC, proceed as follows:
+			* enable the power and backup interface clocks by setting the PWREN and BKPEN bits in the RCC_APB1ENR register
+			* set the DBP bit the Power Control Register (PWR_CR) to enable access to the Backup registers and RTC
 	*/
 	RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
 	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
@@ -75,6 +76,15 @@ _setup_rtc(void) {
 	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
 	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
 	RCC_BACKUPCONTROL = control;
+
+	/* RM0008, 18.3.4:
+		Configuration procedure:
+			1. Poll RTOFF, wait until its value goes to '1'
+			2. Set the CNF bit to enter configuration mode
+			3. Write to one or more RTC registers
+			4. Clear the CNF bit to exit configuration mode
+			5. Poll RTOFF, wait until its value goes to '1' to check the end of the write operation
+	*/
 }
 
 void
