@@ -3,6 +3,9 @@
 #include <io/gpio.h>
 #include <io/timer6.h>
 #include <io/power.h>
+#include <io/rtc.h>
+
+#include "rtc.h"
 
 static const size HSE_FREQ = 8000000;  /* aka HSE OSC */
 static const size LSE_FREQ =   32768;  /* aka LSE OSC */
@@ -69,6 +72,7 @@ _setup_rtc(void) {
 	RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
 	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
 
+	/* TODO shouldn't this only be done once? */
 	RCC_BACKUPCONTROL |= RCC_BACKUPCONTROL_LSEENABLE;
 	while ((RCC_BACKUPCONTROL & RCC_BACKUPCONTROL_LSEREADY) == 0) {}
 
@@ -76,15 +80,6 @@ _setup_rtc(void) {
 	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
 	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
 	RCC_BACKUPCONTROL = control;
-
-	/* RM0008, 18.3.4:
-		Configuration procedure:
-			1. Poll RTOFF, wait until its value goes to '1'
-			2. Set the CNF bit to enter configuration mode
-			3. Write to one or more RTC registers
-			4. Clear the CNF bit to exit configuration mode
-			5. Poll RTOFF, wait until its value goes to '1' to check the end of the write operation
-	*/
 }
 
 void
@@ -101,5 +96,10 @@ main(void) {
 
 	while (*TIMER6_CONTROL1 & TIMER6_CONTROL1_ENABLE) {};
 	*GPIOC_OUTPUT &= ~(1 << 13);
+
+	rtc_time_set(0xFFFF0000);
+	volatile u32 time = rtc_time_get();
+
+	for (;;) {}
 }
 
