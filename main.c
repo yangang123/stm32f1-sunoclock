@@ -83,12 +83,47 @@ _setup_rtc(void) {
 	*RCC_BACKUPCONTROL = control;
 }
 
+const u32 TIME_MINUTE = 60;
+const u32 TIME_HOUR   = 60 * 60;
+const u32 TIME_DAY    = 60 * 60 * 24;
+
+static void
+_alarm_get(u8f *out_alarm_hour, u8f *out_alarm_minute) {
+	u32 alarm = rtc_alarm_get();
+
+	u32 alarm_offset = alarm % TIME_DAY;
+	*out_alarm_hour   = alarm_offset / TIME_HOUR;
+	*out_alarm_minute = alarm_offset % TIME_MINUTE;
+}
+
+static void
+_alarm_arm(u8f alarm_hour, u8f alarm_minute) {
+	u32 time = rtc_time_get();
+
+	u32 alarm_offset = (alarm_hour * TIME_HOUR) + (alarm_minute * TIME_MINUTE);
+	u32 today_start = time - (time % TIME_DAY);
+	u32 today_alarm = today_start + alarm_offset;
+	if (time < today_alarm) {
+		rtc_alarm_set(today_alarm);
+	}
+	else {
+		u32 tomorrow_start = today_start + TIME_DAY;
+		u32 tomorrow_alarm = tomorrow_start + alarm_offset;
+		rtc_alarm_set(tomorrow_alarm);
+	}
+}
+
 void
 main(void) {
 	_setup_clock();
 	_setup_led();
 	_setup_timer6();
 	_setup_rtc();
+
+	u8f alarm_hour;
+	u8f alarm_minute;
+	_alarm_get(&alarm_hour, &alarm_minute);
+	_alarm_arm(alarm_hour, alarm_minute);
 
 	*GPIOC_OUTPUT &= ~(1 << 13);
 	for (size i=0; i<100000; i++) cortexm_noop();
@@ -98,8 +133,7 @@ main(void) {
 	while (*TIMER6_CONTROL1 & TIMER6_CONTROL1_ENABLE) {};
 	*GPIOC_OUTPUT &= ~(1 << 13);
 
-	rtc_time_set(0xFFFF0000);
-	volatile u32 time = rtc_time_get();
+	volatile u32 alarm = rtc_alarm_get();
 
 	for (;;) {}
 }

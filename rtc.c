@@ -44,3 +44,23 @@ rtc_time_get(void) {
 	return value;
 }
 
+void
+rtc_alarm_set(u32 value) {
+	_configmode_begin();
+
+	*RTC_ALARMLOW  = value;
+	*RTC_ALARMHIGH = value >> 16;
+
+	_configmode_end();
+}
+
+u32
+rtc_alarm_get(void) {
+	u32 value = 0;
+
+	value |= *RTC_ALARMLOW;
+	value |= *RTC_ALARMHIGH << 16;
+
+	return value;
+}
+
