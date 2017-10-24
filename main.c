@@ -1,8 +1,10 @@
 #include <cortexm.h>
+#include <nvic.h>
 #include <io/rcc.h>
+#include <io/exti.h>
+#include <io/power.h>
 #include <io/gpio.h>
 #include <io/timer6.h>
-#include <io/power.h>
 #include <io/rtc.h>
 
 #include "rtc.h"
@@ -81,6 +83,12 @@ _setup_rtc(void) {
 	control |= RCC_BACKUPCONTROL_RTCCLOCKENABLE;
 	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
 	*RCC_BACKUPCONTROL = control;
+
+	*RTC_CONTROLHIGH |= RTC_CONTROLHIGH_ALARMINTERRUPTENABLE;
+
+	*EXTI_RISINGTRIGGER |= EXTI_RISINGTRIGGER_RTCALARM;
+	*EXTI_INTERRUPTMASK |= EXTI_INTERRUPTMASK_RTCALARM;
+	*NVIC_ENABLE32TO63_SET = NVIC_ENABLE32TO63_SET_EXTIRTCALARM;
 }
 
 const u32 TIME_MINUTE = 60;
@@ -113,17 +121,32 @@ _alarm_arm(u8f alarm_hour, u8f alarm_minute) {
 	}
 }
 
+__attribute__((__interrupt__))
+void
+isr_exti_rtcalarm(void) {
+	*EXTI_PENDING |= EXTI_PENDING_RTCALARM;
+	*RTC_CONTROLLOW &= ~(RTC_CONTROLLOW_ALARMFLAG);
+
+	*GPIOC_OUTPUT ^= (1 << 13);
+}
+
 void
 main(void) {
 	_setup_clock();
 	_setup_led();
 	_setup_timer6();
 	_setup_rtc();
+	cortexm_interrupt_enable();
 
+	/*
 	u8f alarm_hour;
 	u8f alarm_minute;
 	_alarm_get(&alarm_hour, &alarm_minute);
 	_alarm_arm(alarm_hour, alarm_minute);
+	*/
+
+	volatile u32 time = rtc_time_get();
+	rtc_alarm_set(time + 3);
 
 	*GPIOC_OUTPUT &= ~(1 << 13);
 	for (size i=0; i<100000; i++) cortexm_noop();
