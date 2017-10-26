@@ -128,6 +128,9 @@ isr_exti_rtcalarm(void) {
 	*RTC_CONTROLLOW &= ~(RTC_CONTROLLOW_ALARMFLAG);
 
 	*GPIOC_OUTPUT ^= (1 << 13);
+
+	u32 time = rtc_time_get();
+	rtc_alarm_set(time + 3);
 }
 
 void
@@ -145,19 +148,11 @@ main(void) {
 	_alarm_arm(alarm_hour, alarm_minute);
 	*/
 
-	volatile u32 time = rtc_time_get();
+	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
 
-	*GPIOC_OUTPUT &= ~(1 << 13);
-	for (size i=0; i<100000; i++) cortexm_noop();
-	*GPIOC_OUTPUT |= (1 << 13);
-	for (size i=0; i<100000; i++) cortexm_noop();
-
-	while (*TIMER6_CONTROL1 & TIMER6_CONTROL1_ENABLE) {};
-	*GPIOC_OUTPUT &= ~(1 << 13);
-
-	volatile u32 alarm = rtc_alarm_get();
-
-	for (;;) {}
+	for (;;) {
+		cortexm_interrupt_wait();
+	}
 }
 
