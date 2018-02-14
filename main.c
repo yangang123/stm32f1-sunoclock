@@ -4,6 +4,7 @@
 #include <io/exti.h>
 #include <io/power.h>
 #include <io/gpio.h>
+#include <io/timer1.h>
 #include <io/timer6.h>
 #include <io/rtc.h>
 
@@ -42,6 +43,51 @@ _setup_led(void) {
 	*GPIOC_CONFIGHIGH = config;
 
 	*GPIOC_OUTPUT &= ~(1 << 13);
+}
+
+/* depends on _setup_clock() */
+static void
+_setup_pwm_timer1(void) {
+	*RCC_APB2ENABLE |= (RCC_APB2ENABLE_TIMER1 | RCC_APB2ENABLE_GPIOA | RCC_APB2ENABLE_ALTERNATEFUNCTIONIO);  /* see RM0008, figure 8 for clock tree diagram */
+
+	u32 gac = *GPIOA_CONFIGHIGH;
+	/* timer1 channel2 pin init */
+	gac = (gac & ~(GPIOA_CONFIGHIGH_9CONFIG_MASK)) | GPIOA_CONFIGHIGH_9CONFIG_OUTPUTALTERNATEPUSHPULL;
+	gac = (gac & ~(GPIOA_CONFIGHIGH_9MODE_MASK  )) | GPIOA_CONFIGHIGH_9MODE_OUTPUT2MHZ;
+	/* TODO timer1 channel3 pin init */
+	/* TODO timer1 channel4 pin init */
+	*GPIOA_CONFIGHIGH = gac;
+
+	/* see RM0008, 14.3.10 */
+	u16 t1ccm1 = *TIMER1_CAPTURECOMPAREMODE1;
+	/* timer1 channel2 PWM mode init */
+	t1ccm1 = (t1ccm1 & ~(TIMER1_CAPTURECOMPAREMODE1_2MODE_MASK     )) | TIMER1_CAPTURECOMPAREMODE1_2MODE_PWMMODE1;
+	t1ccm1 = (t1ccm1 & ~(TIMER1_CAPTURECOMPAREMODE1_2SELECTION_MASK)) | TIMER1_CAPTURECOMPAREMODE1_2SELECTION_OUTPUT;
+	t1ccm1 |= TIMER1_CAPTURECOMPAREMODE1_2PRELOADENABLE;
+	/* TODO timer1 channel3 PWM mode init */
+	/* TODO timer1 channel4 PWM mode init */
+	*TIMER1_CAPTURECOMPAREMODE1 = t1ccm1;
+
+	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTPOLARITY;
+	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTENABLE;
+
+	*TIMER1_BREAKANDDEADTIME |= TIMER1_BREAKANDDEADTIME_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
+
+	*TIMER1_CONTROL1 |= TIMER1_CONTROL1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
+
+	*TIMER1_PRESCALER = 7999;
+
+	*TIMER1_RELOAD = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
+
+	*TIMER1_CAPTURECOMPARE2 = 0x8000;  /* PWM duty cycle */ /* see RM0008, 14.3.10 */
+	/* TODO timer1 channel3 compare init */
+	/* TODO timer1 channel4 compare init */
+
+	*TIMER1_VALUE = 0;
+
+	*TIMER1_EVENT |= TIMER1_EVENT_UPDATE;  /* see RM0008, 14.3.10 */
+
+	*TIMER1_CONTROL1 |= TIMER1_CONTROL1_ENABLE;
 }
 
 /* depends on _setup_clock() */
@@ -137,6 +183,7 @@ void
 main(void) {
 	_setup_clock();
 	_setup_led();
+	_setup_pwm_timer1();
 	_setup_timer6();
 	_setup_rtc();
 	cortexm_interrupt_enable();
@@ -147,6 +194,8 @@ main(void) {
 	_alarm_get(&alarm_hour, &alarm_minute);
 	_alarm_arm(alarm_hour, alarm_minute);
 	*/
+
+	*TIMER1_CAPTURECOMPARE2 = 0x8000;
 
 	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
