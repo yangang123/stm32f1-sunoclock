@@ -45,6 +45,16 @@ _setup_led(void) {
 	*GPIOC_OUTPUT &= ~(1 << 13);
 }
 
+/* depends on _setup_pwm_timer1() */
+static void
+_pwm_timer1_set(u8f red, u8f green, u8f blue) {
+	/* PWM duty cycle */ /* see RM0008, 14.3.10 */
+	*TIMER1_CAPTURECOMPARE2 = (  red << 8) | (  red << 0);
+	*TIMER1_CAPTURECOMPARE3 = (green << 8) | (green << 0);
+	*TIMER1_CAPTURECOMPARE4 = ( blue << 8) | ( blue << 0);
+}
+
+
 /* depends on _setup_clock() */
 static void
 _setup_pwm_timer1(void) {
@@ -79,9 +89,7 @@ _setup_pwm_timer1(void) {
 
 	*TIMER1_RELOAD = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
 
-	*TIMER1_CAPTURECOMPARE2 = 0x8000;  /* PWM duty cycle */ /* see RM0008, 14.3.10 */
-	/* TODO timer1 channel3 compare init */
-	/* TODO timer1 channel4 compare init */
+	_pwm_timer1_set(0, 0, 0);
 
 	*TIMER1_VALUE = 0;
 
@@ -194,8 +202,6 @@ main(void) {
 	_alarm_get(&alarm_hour, &alarm_minute);
 	_alarm_arm(alarm_hour, alarm_minute);
 	*/
-
-	*TIMER1_CAPTURECOMPARE2 = 0x8000;
 
 	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
