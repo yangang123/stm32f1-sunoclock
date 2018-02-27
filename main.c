@@ -50,8 +50,10 @@ static void
 _pwm_timer1_set(u8f red, u8f green, u8f blue) {
 	/* PWM duty cycle */ /* see RM0008, 14.3.10 */
 	*TIMER1_CAPTURECOMPARE2 = (  red << 8) | (  red << 0);
+	/* 
 	*TIMER1_CAPTURECOMPARE3 = (green << 8) | (green << 0);
 	*TIMER1_CAPTURECOMPARE4 = ( blue << 8) | ( blue << 0);
+	*/
 }
 
 
@@ -83,7 +85,7 @@ _setup_pwm_timer1(void) {
 
 	*TIMER1_BREAKANDDEADTIME |= TIMER1_BREAKANDDEADTIME_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
 
-	*TIMER1_CONTROL1 |= TIMER1_CONTROL1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
+	timeradv_TIMER1->control1 |= timeradv_control1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
 
 	*TIMER1_PRESCALER = 7999;
 
@@ -95,7 +97,7 @@ _setup_pwm_timer1(void) {
 
 	*TIMER1_EVENT |= TIMER1_EVENT_UPDATE;  /* see RM0008, 14.3.10 */
 
-	*TIMER1_CONTROL1 |= TIMER1_CONTROL1_ENABLE;
+	timeradv_TIMER1->control1 |= timeradv_control1_ENABLE;
 }
 
 /* depends on _setup_clock() */
