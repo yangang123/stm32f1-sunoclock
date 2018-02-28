@@ -47,7 +47,7 @@ _setup_led(void) {
 
 /* depends on _setup_pwm_timer1() */
 static void
-_pwm_timer1_set(u8f red, u8f green, u8f blue) {
+_pwm_timer1_set(u8 red, u8 green, u8 blue) {
 	/* PWM duty cycle */ /* see RM0008, 14.3.10 */
 	*TIMER1_CAPTURECOMPARE2 = (  red << 8) | (  red << 0);
 	/* 
@@ -87,7 +87,7 @@ _setup_pwm_timer1(void) {
 
 	timeradv_TIMER1->control1 |= timeradv_control1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
 
-	*TIMER1_PRESCALER = 7999;
+	*TIMER1_PRESCALER = 0;
 
 	*TIMER1_RELOAD = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
 
@@ -205,11 +205,20 @@ main(void) {
 	_alarm_arm(alarm_hour, alarm_minute);
 	*/
 
+	/*
 	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
+	*/
 
 	for (;;) {
-		cortexm_interrupt_wait();
+		for (i32 i=0; i<0xFF; i++) {
+			for (size j=0; j<0x2000; j++) { cortexm_noop(); }
+			_pwm_timer1_set(i, 0, 0);
+		}
+		for (i32 i=0xFF; i>=0; i--) {
+			for (size j=0; j<0x2000; j++) { cortexm_noop(); }
+			_pwm_timer1_set(i, 0, 0);
+		}
 	}
 }
 
