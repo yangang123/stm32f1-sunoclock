@@ -70,15 +70,15 @@ _setup_pwm_timer1(void) {
 	/* TODO timer1 channel4 pin init */
 	*GPIOA_CONFIGHIGH = gac;
 
-	/* see RM0008, 14.3.10 */
-	u16 t1ccm1 = *TIMER1_CAPTURECOMPAREMODE1;
+	/* see RM0008 14.3.10 */
+	u16 t1ccm1 = timeradv_TIMER1->captureCompareMode1;
 	/* timer1 channel2 PWM mode init */
-	t1ccm1 = (t1ccm1 & ~(TIMER1_CAPTURECOMPAREMODE1_2MODE_MASK     )) | TIMER1_CAPTURECOMPAREMODE1_2MODE_PWMMODE1;
-	t1ccm1 = (t1ccm1 & ~(TIMER1_CAPTURECOMPAREMODE1_2SELECTION_MASK)) | TIMER1_CAPTURECOMPAREMODE1_2SELECTION_OUTPUT;
-	t1ccm1 |= TIMER1_CAPTURECOMPAREMODE1_2PRELOADENABLE;
+	t1ccm1 = (t1ccm1 & ~(timeradv_captureCompareMode1_OUTPUTCOMPARE2_MODE_MASK      )) | timeradv_captureCompareMode1_OUTPUTCOMPARE2_MODE_PWMMODE1;
+	t1ccm1 = (t1ccm1 & ~(timeradv_captureCompareMode1_CAPTURECOMPARE2_SELECTION_MASK)) | timeradv_captureCompareMode1_CAPTURECOMPARE2_SELECTION_OUTPUT;
+	t1ccm1 |= timeradv_captureCompareMode1_OUTPUTCOMPARE2_PRELOADENABLE;
 	/* TODO timer1 channel3 PWM mode init */
 	/* TODO timer1 channel4 PWM mode init */
-	*TIMER1_CAPTURECOMPAREMODE1 = t1ccm1;
+	timeradv_TIMER1->captureCompareMode1 = t1ccm1;
 
 	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTPOLARITY;
 	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTENABLE;
@@ -95,7 +95,7 @@ _setup_pwm_timer1(void) {
 
 	*TIMER1_VALUE = 0;
 
-	timeradv_TIMER1->event |= timeradv_event_UPDATE;  /* see RM0008, 14.3.10 */
+	timeradv_TIMER1->eventGeneration |= timeradv_eventGeneration_UPDATEGENERATION;  /* see RM0008, 14.3.10 */
 
 	timeradv_TIMER1->control1 |= timeradv_control1_ENABLE;
 }
