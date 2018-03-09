@@ -80,8 +80,10 @@ _setup_pwm_timer1(void) {
 	/* TODO timer1 channel4 PWM mode init */
 	timeradv_TIMER1->captureCompareMode1 = t1ccm1;
 
-	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTPOLARITY;
-	*TIMER1_CAPTURECOMPAREENABLE |= TIMER1_CAPTURECOMPAREENABLE_2OUTPUTENABLE;
+	u16 t1cce = timeradv_TIMER1->captureCompareEnable;
+	t1cce |= timeradv_captureCompareEnable_CAPTURECOMPARE2_OUTPUTPOLARITY;
+	t1cce |= timeradv_captureCompareEnable_CAPTURECOMPARE2_OUTPUTENABLE;
+	timeradv_TIMER1->captureCompareEnable = t1cce;
 
 	*TIMER1_BREAKANDDEADTIME |= TIMER1_BREAKANDDEADTIME_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
 
