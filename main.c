@@ -95,7 +95,7 @@ _setup_pwm_timer1(void) {
 
 	_pwm_timer1_set(0, 0, 0);
 
-	*TIMER1_VALUE = 0;
+	timeradv_TIMER1->counter = 0;
 
 	timeradv_TIMER1->eventGeneration |= timeradv_eventGeneration_UPDATEGENERATION;  /* see RM0008, 14.3.10 */
 
