@@ -95,7 +95,7 @@ _setup_pwm_timer1(void) {
 
 	*TIMER1_VALUE = 0;
 
-	*TIMER1_EVENT |= TIMER1_EVENT_UPDATE;  /* see RM0008, 14.3.10 */
+	timeradv_TIMER1->event |= timeradv_event_UPDATE;  /* see RM0008, 14.3.10 */
 
 	timeradv_TIMER1->control1 |= timeradv_control1_ENABLE;
 }
