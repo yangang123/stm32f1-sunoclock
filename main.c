@@ -85,7 +85,7 @@ _setup_pwm_timer1(void) {
 	t1cce |= timeradv_captureCompareEnable_CAPTURECOMPARE2_OUTPUTENABLE;
 	timeradv_TIMER1->captureCompareEnable = t1cce;
 
-	*TIMER1_BREAKANDDEADTIME |= TIMER1_BREAKANDDEADTIME_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
+	timeradv_TIMER1->breakAndDeadTime |= timeradv_breakAndDeadTime_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
 
 	timeradv_TIMER1->control1 |= timeradv_control1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
 
