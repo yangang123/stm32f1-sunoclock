@@ -89,7 +89,7 @@ _setup_pwm_timer1(void) {
 
 	timeradv_TIMER1->control1 |= timeradv_control1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
 
-	*TIMER1_PRESCALER = 0;
+	timeradv_TIMER1->prescaler = 0;
 
 	*TIMER1_RELOAD = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
 
