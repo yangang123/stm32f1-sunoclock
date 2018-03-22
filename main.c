@@ -49,10 +49,10 @@ _setup_led(void) {
 static void
 _pwm_timer1_set(u8 red, u8 green, u8 blue) {
 	/* PWM duty cycle */ /* see RM0008, 14.3.10 */
-	*TIMER1_CAPTURECOMPARE2 = (  red << 8) | (  red << 0);
+	timeradv_TIMER1->captureCompare2 = (  red << 8) | (  red << 0);
 	/* 
-	*TIMER1_CAPTURECOMPARE3 = (green << 8) | (green << 0);
-	*TIMER1_CAPTURECOMPARE4 = ( blue << 8) | ( blue << 0);
+	timeradv_TIMER1->captureCompare3 = (green << 8) | (green << 0);
+	timeradv_TIMER1->captureCompare4 = ( blue << 8) | ( blue << 0);
 	*/
 }
 
