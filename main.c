@@ -4,7 +4,7 @@
 #include <io/exti.h>
 #include <io/power.h>
 #include <io/gpio.h>
-#include <io/timer1.h>
+#include <io/tim.h>
 #include <io/timer6.h>
 #include <io/rtc.h>
 
@@ -49,10 +49,10 @@ _setup_led(void) {
 static void
 _pwm_timer1_set(u8 red, u8 green, u8 blue) {
 	/* PWM duty cycle */ /* see RM0008, 14.3.10 */
-	timeradv_TIMER1->captureCompare2 = (  red << 8) | (  red << 0);
+	tim_TIM1->CCR2 = (  red << 8) | (  red << 0);
 	/* 
-	timeradv_TIMER1->captureCompare3 = (green << 8) | (green << 0);
-	timeradv_TIMER1->captureCompare4 = ( blue << 8) | ( blue << 0);
+	tim_TIM1->CCR3 = (green << 8) | (green << 0);
+	tim_TIM1->CCR4 = ( blue << 8) | ( blue << 0);
 	*/
 }
 
@@ -71,35 +71,35 @@ _setup_pwm_timer1(void) {
 	*GPIOA_CONFIGHIGH = gac;
 
 	/* see RM0008 14.3.10 */
-	u16 t1ccm1 = timeradv_TIMER1->captureCompareMode1;
+	u16 ccmr1 = tim_TIM1->CCMR1;
 	/* timer1 channel2 PWM mode init */
-	t1ccm1 = (t1ccm1 & ~(timeradv_captureCompareMode1_OUTPUTCOMPARE2_MODE_MASK      )) | timeradv_captureCompareMode1_OUTPUTCOMPARE2_MODE_PWMMODE1;
-	t1ccm1 = (t1ccm1 & ~(timeradv_captureCompareMode1_CAPTURECOMPARE2_SELECTION_MASK)) | timeradv_captureCompareMode1_CAPTURECOMPARE2_SELECTION_OUTPUT;
-	t1ccm1 |= timeradv_captureCompareMode1_OUTPUTCOMPARE2_PRELOADENABLE;
+	ccmr1 = (ccmr1 & ~(tim_CCMR1_OC2M_MASK)) | tim_CCMR1_OC2M_PWMMODE1;
+	ccmr1 = (ccmr1 & ~(tim_CCMR1_CC2S_MASK)) | tim_CCMR1_CC2S_OUTPUT;
+	ccmr1 |= tim_CCMR1_OC2PE;
 	/* TODO timer1 channel3 PWM mode init */
 	/* TODO timer1 channel4 PWM mode init */
-	timeradv_TIMER1->captureCompareMode1 = t1ccm1;
+	tim_TIM1->CCMR1 = ccmr1;
 
-	u16 t1cce = timeradv_TIMER1->captureCompareEnable;
-	t1cce |= timeradv_captureCompareEnable_CAPTURECOMPARE2_OUTPUTPOLARITY;
-	t1cce |= timeradv_captureCompareEnable_CAPTURECOMPARE2_OUTPUTENABLE;
-	timeradv_TIMER1->captureCompareEnable = t1cce;
+	u16 ccer = tim_TIM1->CCER;
+	ccer |= tim_CCER_CC2P;
+	ccer |= tim_CCER_CC2E;
+	tim_TIM1->CCER = ccer;
 
-	timeradv_TIMER1->breakAndDeadTime |= timeradv_breakAndDeadTime_MAINOUTPUTENABLE;  /* see RM0008, table 83 */
+	tim_TIM1->BDTR |= tim_BDTR_MOE;  /* see RM0008, table 83 */
 
-	timeradv_TIMER1->control1 |= timeradv_control1_RELOADPRELOADENABLE;  /* see RM0008, 14.3.10 */
+	tim_TIM1->CR1 |= tim_CR1_ARPE;  /* see RM0008, 14.3.10 */
 
-	timeradv_TIMER1->prescaler = 0;
+	tim_TIM1->PSC = 0;
 
-	timeradv_TIMER1->reload = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
+	tim_TIM1->ARR = 0xFFFF;  /* PWM frequency */ /* see RM0008, 14.3.10 */
 
 	_pwm_timer1_set(0, 0, 0);
 
-	timeradv_TIMER1->counter = 0;
+	tim_TIM1->CNT = 0;
 
-	timeradv_TIMER1->eventGeneration |= timeradv_eventGeneration_UPDATEGENERATION;  /* see RM0008, 14.3.10 */
+	tim_TIM1->EGR |= tim_EGR_UG;  /* see RM0008, 14.3.10 */
 
-	timeradv_TIMER1->control1 |= timeradv_control1_ENABLE;
+	tim_TIM1->CR1 |= tim_CR1_CEN;
 }
 
 /* depends on _setup_clock() */
