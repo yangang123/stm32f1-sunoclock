@@ -5,7 +5,6 @@
 #include <io/power.h>
 #include <io/gpio.h>
 #include <io/tim.h>
-#include <io/timer6.h>
 #include <io/rtc.h>
 
 #include "rtc.h"
@@ -104,25 +103,6 @@ _setup_pwm_timer1(void) {
 
 /* depends on _setup_clock() */
 static void
-_setup_timer6(void) {
-	*RCC_APB1ENABLE |= RCC_APB1ENABLE_TIMER6;  /* see RM0008, figure 11 for clock tree diagram */
-
-	*TIMER6_PRESCALER = 23999;
-
-	*TIMER6_RELOAD = 10000;
-
-	*TIMER6_VALUE = 0;
-
-	*TIMER6_EVENT |= TIMER6_EVENT_UPDATE;
-
-	/* TODO remove these */
-	//TIMER6_CONTROL1 = (TIMER6_CONTROL1_UPDATEEVENTDISABLE | TIMER6_CONTROL1_ENABLE);
-	//TIMER6_CONTROL1 |= (TIMER6_CONTROL1_ONEPULSEMODE | TIMER6_CONTROL1_ENABLE);
-	*TIMER6_CONTROL1 |= (TIMER6_CONTROL1_ENABLE);
-}
-
-/* depends on _setup_clock() */
-static void
 _setup_rtc(void) {
 	/* RM0008, 18.1:
 		To enable access to the Backup registers and the RTC, proceed as follows:
@@ -196,7 +176,6 @@ main(void) {
 	_setup_clock();
 	_setup_led();
 	_setup_pwm_timer1();
-	_setup_timer6();
 	_setup_rtc();
 	cortexm_interrupt_enable();
 
