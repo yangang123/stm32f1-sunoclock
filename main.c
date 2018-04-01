@@ -36,12 +36,12 @@ static void
 _setup_led(void) {
 	*RCC_APB2ENABLE |= RCC_APB2ENABLE_GPIOC;  /* see RM0008, figure 8 for clock tree diagram */
 
-	u32 config = *GPIOC_CONFIGHIGH;
-	config = (config & ~(GPIOC_CONFIGHIGH_13CONFIG_MASK)) | GPIOC_CONFIGHIGH_13CONFIG_GENERALPUSHPULL;
-	config = (config & ~(GPIOC_CONFIGHIGH_13MODE_MASK  )) | GPIOC_CONFIGHIGH_13MODE_OUTPUT2MHZ;
-	*GPIOC_CONFIGHIGH = config;
+	u32 crh = GPIOC->CRH;
+	crh = (crh & ~(gpio_CRH_CNF13_MASK )) | gpio_CRH_CNF13_OUT_GPPP;
+	crh = (crh & ~(gpio_CRH_MODE13_MASK)) | gpio_CRH_MODE13_OUT_2MHZ;
+	GPIOC->CRH = crh;
 
-	*GPIOC_OUTPUT &= ~(1 << 13);
+	GPIOC->ODR &= ~(1 << 13);
 }
 
 /* depends on _setup_pwm_timer1() */
@@ -61,13 +61,13 @@ static void
 _setup_pwm_timer1(void) {
 	*RCC_APB2ENABLE |= (RCC_APB2ENABLE_TIMER1 | RCC_APB2ENABLE_GPIOA | RCC_APB2ENABLE_ALTERNATEFUNCTIONIO);  /* see RM0008, figure 8 for clock tree diagram */
 
-	u32 gac = *GPIOA_CONFIGHIGH;
+	u32 crh = GPIOA->CRH;
 	/* timer1 channel2 pin init */
-	gac = (gac & ~(GPIOA_CONFIGHIGH_9CONFIG_MASK)) | GPIOA_CONFIGHIGH_9CONFIG_OUTPUTALTERNATEPUSHPULL;
-	gac = (gac & ~(GPIOA_CONFIGHIGH_9MODE_MASK  )) | GPIOA_CONFIGHIGH_9MODE_OUTPUT2MHZ;
+	crh = (crh & ~(gpio_CRH_CNF9_MASK )) | gpio_CRH_CNF9_OUT_AFPP;
+	crh = (crh & ~(gpio_CRH_MODE9_MASK)) | gpio_CRH_MODE9_OUT_2MHZ;
 	/* TODO timer1 channel3 pin init */
 	/* TODO timer1 channel4 pin init */
-	*GPIOA_CONFIGHIGH = gac;
+	GPIOA->CRH = crh;
 
 	/* see RM0008 14.3.10 */
 	u32 ccmr1 = tim_TIM1->CCMR1;
@@ -165,7 +165,7 @@ isr_exti_rtcalarm(void) {
 	*EXTI_PENDING |= EXTI_PENDING_RTCALARM;
 	*RTC_CONTROLLOW &= ~(RTC_CONTROLLOW_ALARMFLAG);
 
-	*GPIOC_OUTPUT ^= (1 << 13);
+	GPIOC->ODR ^= (1 << 13);
 
 	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
