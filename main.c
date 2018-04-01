@@ -70,7 +70,7 @@ _setup_pwm_timer1(void) {
 	*GPIOA_CONFIGHIGH = gac;
 
 	/* see RM0008 14.3.10 */
-	u16 ccmr1 = tim_TIM1->CCMR1;
+	u32 ccmr1 = tim_TIM1->CCMR1;
 	/* timer1 channel2 PWM mode init */
 	ccmr1 = (ccmr1 & ~(tim_CCMR1_OC2M_MASK)) | tim_CCMR1_OC2M_PWMMODE1;
 	ccmr1 = (ccmr1 & ~(tim_CCMR1_CC2S_MASK)) | tim_CCMR1_CC2S_OUTPUT;
@@ -79,7 +79,7 @@ _setup_pwm_timer1(void) {
 	/* TODO timer1 channel4 PWM mode init */
 	tim_TIM1->CCMR1 = ccmr1;
 
-	u16 ccer = tim_TIM1->CCER;
+	u32 ccer = tim_TIM1->CCER;
 	ccer |= tim_CCER_CC2P;
 	ccer |= tim_CCER_CC2E;
 	tim_TIM1->CCER = ccer;
