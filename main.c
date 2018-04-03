@@ -2,7 +2,7 @@
 #include <nvic.h>
 #include <io/rcc.h>
 #include <io/exti.h>
-#include <io/power.h>
+#include <io/pwr.h>
 #include <io/gpio.h>
 #include <io/tim.h>
 #include <io/rtc.h>
@@ -110,7 +110,7 @@ _setup_rtc(void) {
 			* set the DBP bit the Power Control Register (PWR_CR) to enable access to the Backup registers and RTC
 	*/
 	*RCC_APB1ENABLE |= (RCC_APB1ENABLE_POWER | RCC_APB1ENABLE_BACKUP);
-	*POWER_CONTROL |= POWER_CONTROL_BACKUPWRITEENABLE;
+	PWR->CR |= pwr_CR_DBP;
 
 	if ((*RCC_BACKUPCONTROL & RCC_BACKUPCONTROL_LSEREADY) == 0) {
 		*RCC_BACKUPCONTROL |= RCC_BACKUPCONTROL_LSEENABLE;
