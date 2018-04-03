@@ -122,7 +122,7 @@ _setup_rtc(void) {
 	control = (control & ~(RCC_BACKUPCONTROL_RTCCLOCKSELECT_MASK)) | RCC_BACKUPCONTROL_RTCCLOCKSELECT_LSE;
 	*RCC_BACKUPCONTROL = control;
 
-	*RTC_CONTROLHIGH |= RTC_CONTROLHIGH_ALARMINTERRUPTENABLE;
+	RTC->CRH |= rtc_CRH_ALRIE;
 
 	EXTI->RTSR |= exti_RTSR_RTCALARM;
 	EXTI->IMR |= exti_IMR_RTCALARM;
@@ -163,7 +163,7 @@ __attribute__((__interrupt__))
 void
 isr_exti_rtcalarm(void) {
 	EXTI->PR |= exti_PR_RTCALARM;
-	*RTC_CONTROLLOW &= ~(RTC_CONTROLLOW_ALARMFLAG);
+	RTC->CRL &= ~(rtc_CRL_ALRF);
 
 	GPIOC->ODR ^= (1 << 13);
 
