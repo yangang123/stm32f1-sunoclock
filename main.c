@@ -124,8 +124,8 @@ _setup_rtc(void) {
 
 	*RTC_CONTROLHIGH |= RTC_CONTROLHIGH_ALARMINTERRUPTENABLE;
 
-	*EXTI_RISINGTRIGGER |= EXTI_RISINGTRIGGER_RTCALARM;
-	*EXTI_INTERRUPTMASK |= EXTI_INTERRUPTMASK_RTCALARM;
+	EXTI->RTSR |= exti_RTSR_RTCALARM;
+	EXTI->IMR |= exti_IMR_RTCALARM;
 	NVIC->ISER1 = nvic_ISER1_RTCALARM;
 }
 
@@ -162,7 +162,7 @@ _alarm_arm(u8f alarm_hour, u8f alarm_minute) {
 __attribute__((__interrupt__))
 void
 isr_exti_rtcalarm(void) {
-	*EXTI_PENDING |= EXTI_PENDING_RTCALARM;
+	EXTI->PR |= exti_PR_RTCALARM;
 	*RTC_CONTROLLOW &= ~(RTC_CONTROLLOW_ALARMFLAG);
 
 	GPIOC->ODR ^= (1 << 13);
@@ -186,10 +186,8 @@ main(void) {
 	_alarm_arm(alarm_hour, alarm_minute);
 	*/
 
-	/*
 	u32 time = rtc_time_get();
 	rtc_alarm_set(time + 3);
-	*/
 
 	for (;;) {
 		for (i32 i=0; i<0xFF; i++) {
