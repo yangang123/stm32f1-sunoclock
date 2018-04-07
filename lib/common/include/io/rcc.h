@@ -65,10 +65,11 @@ static const u32 rcc_APB2RSTR_TIM1RST = (1 << 11);  /* TIM1 timer ReSeT */
 /* TODO rcc_APB2RSTR bits */
 
 /* RM0008 7.3.7 */
-static const u32 rcc_APB2ENR_TIM1EN = (1 << 11);  /* TIMer 1 ENable */
-static const u32 rcc_APB2ENR_IOPCEN = (1 <<  4);  /* gpIO Port C ENable */
-static const u32 rcc_APB2ENR_IOPAEN = (1 <<  2);  /* gpIO Port A ENable */
-static const u32 rcc_APB2ENR_AFIOEN = (1 <<  0);  /* Alternate Function IO ENable */
+static const u32 rcc_APB2ENR_USART1EN = (1 << 14);  /* USART1 ENable */
+static const u32 rcc_APB2ENR_TIM1EN   = (1 << 11);  /* TIMer 1 ENable */
+static const u32 rcc_APB2ENR_IOPCEN   = (1 <<  4);  /* gpIO Port C ENable */
+static const u32 rcc_APB2ENR_IOPAEN   = (1 <<  2);  /* gpIO Port A ENable */
+static const u32 rcc_APB2ENR_AFIOEN   = (1 <<  0);  /* Alternate Function IO ENable */
 /* TODO rcc_APB2ENR bits */
 
 /* RM0008 7.3.8 */

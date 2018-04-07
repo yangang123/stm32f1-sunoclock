@@ -6,11 +6,18 @@
 #include <io/gpio.h>
 #include <io/tim.h>
 #include <io/rtc.h>
+#include <io/usart.h>
 
 #include "rtc.h"
 
-static const size HSE_FREQ = 8000000;  /* aka HSE OSC */
-static const size LSE_FREQ =   32768;  /* aka LSE OSC */
+static const size
+	SYSCLK_FREQ,
+	AHB_FREQ,
+	APB1_FREQ,
+	APB2_FREQ
+= 8000000;
+
+static const size USART1_BAUD = 300;
 
 static void
 _setup_clock(void) {
@@ -129,6 +136,30 @@ _setup_rtc(void) {
 	NVIC->ISER1 = nvic_ISER1_RTCALARM;
 }
 
+/* depends on _setup_clock() */
+static void
+_setup_usart1(void) {
+	RCC->APB2ENR |= (rcc_APB2ENR_USART1EN | rcc_APB2ENR_IOPAEN | rcc_APB2ENR_AFIOEN);
+
+	/* RM0008 table 24, table 54 */
+	u32 crh = GPIOA->CRH;
+	u32 odr = GPIOA->ODR;
+	/* set TX pin to alternate function push-pull at 2Mhz */ /* RM0008 table 54 */
+	crh = (crh & ~(gpio_CRH_CNF9_MASK )) | gpio_CRH_CNF9_OUT_AFPP;
+	crh = (crh & ~(gpio_CRH_MODE9_MASK)) | gpio_CRH_MODE9_OUT_2MHZ;
+	/* set RX pin to input with pull-up */ /* RM0008 table 54 */
+	crh = (crh & ~(gpio_CRH_CNF10_MASK )) | gpio_CRH_CNF10_IN_PUPD;
+	crh = (crh & ~(gpio_CRH_MODE10_MASK)) | gpio_CRH_MODE10_IN;
+	odr |= (1 << 10);
+	/* done */
+	GPIOA->CRH = crh;
+	GPIOA->ODR = odr;
+
+	USART1->BRR = usart_BRR_MACRO(APB2_FREQ, USART1_BAUD);
+
+	USART1->CR1 |= (usart_CR1_UE | usart_CR1_TE | usart_CR1_RE);
+}
+
 const u32 TIME_MINUTE = 60;
 const u32 TIME_HOUR   = 60 * 60;
 const u32 TIME_DAY    = 60 * 60 * 24;
@@ -175,9 +206,10 @@ void
 main(void) {
 	_setup_clock();
 	_setup_led();
-	_setup_pwm_timer1();
+	/*_setup_pwm_timer1();*/
 	_setup_rtc();
 	cortexm_interrupt_enable();
+	_setup_usart1();
 
 	/*
 	u8f alarm_hour;
@@ -190,6 +222,12 @@ main(void) {
 	rtc_alarm_set(time + 3);
 
 	for (;;) {
+		USART1->DR = 'Q';
+		for (size j=0; j<0x20000; j++) { cortexm_noop(); }
+	}
+
+	/*
+	for (;;) {
 		for (i32 i=0; i<0xFF; i++) {
 			for (size j=0; j<0x2000; j++) { cortexm_noop(); }
 			_pwm_timer1_set(i, 0, 0);
@@ -199,5 +237,6 @@ main(void) {
 			_pwm_timer1_set(i, 0, 0);
 		}
 	}
+	*/
 }
 

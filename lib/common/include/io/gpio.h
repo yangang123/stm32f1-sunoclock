@@ -15,14 +15,21 @@ struct __attribute__ ((__packed__)) gpio {
 };
 
 /* RM0008 9.2.2 */
-static const u32 gpio_CRH_CNF13_MASK      = (0b11 << 22);
-static const u32 gpio_CRH_CNF13_OUT_GPPP  = (0b00 << 22);  /* port CoNFiguration pin 13, OUTput mode, General-Purpose output Push-Pull */
-static const u32 gpio_CRH_MODE13_MASK     = (0b11 << 20);
-static const u32 gpio_CRH_MODE13_OUT_2MHZ = (0b10 << 20);  /* port MODE pin 13, OUTput mode, 2MHZ */
-static const u32 gpio_CRH_CNF9_MASK      = (0b11 <<  6);
-static const u32 gpio_CRH_CNF9_OUT_AFPP  = (0b10 <<  6);  /* port CoNFiguration pin 9, OUTput mode, Alternate Function output Push-Pull */
-static const u32 gpio_CRH_MODE9_MASK     = (0b11 <<  4);
-static const u32 gpio_CRH_MODE9_OUT_2MHZ = (0b10 <<  4);  /* port MODE pin 9, OUTput mode, 2MHZ */
+/* pin 13 */
+static const u32 gpio_CRH_CNF13_MASK       = (0b11 << 22);
+static const u32 gpio_CRH_CNF13_OUT_GPPP   = (0b00 << 22);  /* port CoNFiguration pin 13, OUTput mode, General-Purpose output Push-Pull */
+static const u32 gpio_CRH_MODE13_MASK      = (0b11 << 20);
+static const u32 gpio_CRH_MODE13_OUT_2MHZ  = (0b10 << 20);  /* port MODE pin 13, OUTput mode, 2MHZ */
+/* pin 10 */
+static const u32 gpio_CRH_CNF10_MASK       = (0b11 << 10);
+static const u32 gpio_CRH_CNF10_IN_PUPD    = (0b10 << 10);  /* port CoNFiguration pin 10, INput mode, Pull-Up/Pull-Down */
+static const u32 gpio_CRH_MODE10_MASK      = (0b11 <<  8);
+static const u32 gpio_CRH_MODE10_IN        = (0b00 <<  8);  /* port MODE pin 10, INput mode */
+/* pin 9 */
+static const u32 gpio_CRH_CNF9_MASK        = (0b11 <<  6);
+static const u32 gpio_CRH_CNF9_OUT_AFPP    = (0b10 <<  6);  /* port CoNFiguration pin 9, OUTput mode, Alternate Function output Push-Pull */
+static const u32 gpio_CRH_MODE9_MASK       = (0b11 <<  4);
+static const u32 gpio_CRH_MODE9_OUT_2MHZ   = (0b10 <<  4);  /* port MODE pin 9, OUTput mode, 2MHZ */
 /* TODO other GPIOx_CRH bits */
 
 /* RM0008 table 3 */
