@@ -1,3 +1,0 @@
-[submodule "stm32f1-common"]
-	path = lib/common
-	url = https://github.com/DavidDiPaola/stm32f1-common
