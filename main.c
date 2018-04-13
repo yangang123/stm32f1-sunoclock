@@ -8,7 +8,7 @@
 #include <io/rtc.h>
 #include <io/usart.h>
 
-#include "rtc.h"
+#include "lib/rtc/rtc.h"
 
 static const size
 	SYSCLK_FREQ,
@@ -110,34 +110,6 @@ _setup_pwm_timer1(void) {
 
 /* depends on _setup_clock() */
 static void
-_setup_rtc(void) {
-	/* RM0008 18.1:
-		To enable access to the Backup registers and the RTC, proceed as follows:
-			* enable the power and backup interface clocks by setting the PWREN and BKPEN bits in the RCC_APB1ENR register
-			* set the DBP bit the Power Control Register (PWR_CR) to enable access to the Backup registers and RTC
-	*/
-	RCC->APB1ENR |= (rcc_APB1ENR_PWREN | rcc_APB1ENR_BKPEN);
-	PWR->CR |= pwr_CR_DBP;
-
-	if ((RCC->BDCR & rcc_BDCR_LSERDY) == 0) {
-		RCC->BDCR |= rcc_BDCR_LSEON;
-		while ((RCC->BDCR & rcc_BDCR_LSERDY) == 0) {}
-	}
-
-	u32 bdcr = RCC->BDCR;
-	bdcr |= rcc_BDCR_RTCEN;
-	bdcr = (bdcr & ~(rcc_BDCR_RTCSEL_MASK)) | rcc_BDCR_RTCSEL_LSE;
-	RCC->BDCR = bdcr;
-
-	RTC->CRH |= rtc_CRH_ALRIE;
-
-	EXTI->RTSR |= exti_RTSR_RTCALARM;
-	EXTI->IMR |= exti_IMR_RTCALARM;
-	NVIC->ISER1 = nvic_ISER1_RTCALARM;
-}
-
-/* depends on _setup_clock() */
-static void
 _setup_usart1(void) {
 	RCC->APB2ENR |= (rcc_APB2ENR_USART1EN | rcc_APB2ENR_IOPAEN | rcc_APB2ENR_AFIOEN);
 
@@ -190,12 +162,8 @@ _alarm_arm(u8f alarm_hour, u8f alarm_minute) {
 	}
 }
 
-__attribute__((__interrupt__))
-void
-isr_exti_rtcalarm(void) {
-	EXTI->PR |= exti_PR_RTCALARM;
-	RTC->CRL &= ~(rtc_CRL_ALRF);
-
+static void
+_rtc_alarm_handler(void) {
 	GPIOC->ODR ^= (1 << 13);
 
 	u32 time = rtc_time_get();
@@ -207,7 +175,8 @@ main(void) {
 	_setup_clock();
 	_setup_led();
 	/*_setup_pwm_timer1();*/
-	_setup_rtc();
+	rtc_init(rtc_clksrc_LSE);
+	rtc_alarm_handler_set(&_rtc_alarm_handler);
 	cortexm_interrupt_enable();
 	_setup_usart1();
 
