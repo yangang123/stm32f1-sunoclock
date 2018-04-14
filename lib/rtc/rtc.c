@@ -1,3 +1,8 @@
+/*
+2018 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
 #include <io/rtc.h>
 #include <io/rcc.h>
 #include <io/pwr.h>
@@ -42,6 +47,7 @@ rtc_init(enum rtc_clksrc clksrc) {
 		bdcr = (bdcr & ~(rcc_BDCR_RTCSEL_MASK)) | rcc_BDCR_RTCSEL_LSE;
 		RCC->BDCR = bdcr;
 	}
+	/* TODO other clock sources */
 }
 
 static void

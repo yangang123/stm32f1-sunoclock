@@ -1,3 +1,8 @@
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
 /* interrupt and event handlers (RM0008 table 63) */
 .org 0x00000000
 	.word stack_top  /* initial SP value (RM0008 Figure 11) */

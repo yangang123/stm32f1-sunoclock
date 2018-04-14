@@ -1,3 +1,6 @@
+# 2017 David DiPaola
+# licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+
 COMMON_MCU_LINE ?= 
 COMMON_MCU_DENSITY ?= 
 COMMON_DIR ?= .

@@ -9,6 +9,7 @@
 #include <io/usart.h>
 
 #include "lib/rtc/rtc.h"
+#include "lib/usart/usart.h"
 
 static const size
 	SYSCLK_FREQ,
@@ -108,30 +109,6 @@ _setup_pwm_timer1(void) {
 	tim_TIM1->CR1 |= tim_CR1_CEN;
 }
 
-/* depends on _setup_clock() */
-static void
-_setup_usart1(void) {
-	RCC->APB2ENR |= (rcc_APB2ENR_USART1EN | rcc_APB2ENR_IOPAEN | rcc_APB2ENR_AFIOEN);
-
-	/* RM0008 table 24, table 54 */
-	u32 crh = GPIOA->CRH;
-	u32 odr = GPIOA->ODR;
-	/* set TX pin to alternate function push-pull at 2Mhz */ /* RM0008 table 54 */
-	crh = (crh & ~(gpio_CRH_CNF9_MASK )) | gpio_CRH_CNF9_OUT_AFPP;
-	crh = (crh & ~(gpio_CRH_MODE9_MASK)) | gpio_CRH_MODE9_OUT_2MHZ;
-	/* set RX pin to input with pull-up */ /* RM0008 table 54 */
-	crh = (crh & ~(gpio_CRH_CNF10_MASK )) | gpio_CRH_CNF10_IN_PUPD;
-	crh = (crh & ~(gpio_CRH_MODE10_MASK)) | gpio_CRH_MODE10_IN;
-	odr |= (1 << 10);
-	/* done */
-	GPIOA->CRH = crh;
-	GPIOA->ODR = odr;
-
-	USART1->BRR = usart_BRR_MACRO(APB2_FREQ, USART1_BAUD);
-
-	USART1->CR1 |= (usart_CR1_UE | usart_CR1_TE | usart_CR1_RE);
-}
-
 const u32 TIME_MINUTE = 60;
 const u32 TIME_HOUR   = 60 * 60;
 const u32 TIME_DAY    = 60 * 60 * 24;
@@ -167,7 +144,7 @@ _rtc_alarm_handler(void) {
 	GPIOC->ODR ^= (1 << 13);
 
 	u32 time = rtc_time_get();
-	rtc_alarm_set(time + 3);
+	rtc_alarm_set(time + 1);
 }
 
 void
@@ -177,22 +154,19 @@ main(void) {
 	/*_setup_pwm_timer1();*/
 	rtc_init(rtc_clksrc_LSE);
 	rtc_alarm_handler_set(&_rtc_alarm_handler);
+	usart_init(USART1, APB2_FREQ, USART1_BAUD);
 	cortexm_interrupt_enable();
-	_setup_usart1();
+	usart_write_str_nl(USART1, "init complete");
 
-	/*
-	u8f alarm_hour;
-	u8f alarm_minute;
-	_alarm_get(&alarm_hour, &alarm_minute);
-	_alarm_arm(alarm_hour, alarm_minute);
-	*/
-
-	u32 time = rtc_time_get();
-	rtc_alarm_set(time + 3);
+	_rtc_alarm_handler();
 
 	for (;;) {
-		USART1->DR = 'Q';
-		for (size j=0; j<0x20000; j++) { cortexm_noop(); }
+		cortexm_interrupt_wait();
+
+		usart_write_str(USART1, "time: ");
+		u32 time = rtc_time_get();
+		usart_write_hex_u32(USART1, time);
+		usart_write_str_nl(USART1, NULL);
 	}
 
 	/*

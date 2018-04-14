@@ -1,4 +1,4 @@
-SRC_C = main.c lib/rtc/rtc.c
+SRC_C = main.c lib/rtc/rtc.c lib/usart/usart.c
 
 COMMON_MCU_LINE = F103
 COMMON_MCU_DENSITY = MEDIUM

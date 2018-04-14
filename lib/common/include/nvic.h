@@ -1,5 +1,10 @@
-#ifndef _STM32F1COMMON_NVIC_H
-#define _STM32F1COMMON_NVIC_H
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+#ifndef _COMMON_NVIC_H
+#define _COMMON_NVIC_H
 
 /* PM0056 4.3.11 */
 struct __attribute__ ((__packed__)) nvic {

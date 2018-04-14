@@ -1,7 +1,9 @@
-# stm32f1-common
-minimal support code for ST Microelectronics' F1-series microcontrollers
+# common
+stm32f1 common support code
 
 [GitHub](https://github.com/DavidDiPaola/stm32f1-common)
+
+like [avr-libc](http://www.nongnu.org/avr-libc/) but smaller
 
 ## dependencies
   - make
@@ -65,7 +67,18 @@ include $(COMMON_DIR)/Makefile
     - override example: `make GDB="gdb-multiarch" run-debug-client`
   - check Makefile for more (look for `?=`)
 
-## supported MCU models
-  - all -- _incomplete_ support: TIM1/8, TIM2/3/4/5, TIM9/10/11/12/13/14, TIM6/7
-  - STM32F103C8T6 -- _incomplete_ support: EXTI, GPIOA, GPIOC, PWR, RCC, RTC, TIM1, TIM2/3/4/5
+## supported MCU peripherals
+  - EXTI (not all register bits defined)
+  - GPIO (not all register bits defined)
+  - PWR (not all register bits defined)
+  - RCC (not all register bits defined)
+  - RTC (not all register bits defined)
+  - TIM (not all register bits defined)
+    - advanced timers 1 & 8
+    - general purpose timers 2, 3, 4, & 5
+    - general purpose timers 9, 10, 11, 12, 13, & 14
+    - basic timers 6 & 7
+  - USART (not all register bits defined)
+    - USARTs 1, 2, & 3
+    - UARTs 4 & 5
 

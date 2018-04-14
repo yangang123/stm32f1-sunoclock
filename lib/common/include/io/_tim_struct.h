@@ -1,4 +1,9 @@
 /*
+2018 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+/*
 params:
 	_TIM_STRUCT_ISADV: if defined: declare advanced control timer registers
 	_TIM_STRUCT_ISGP: if defined: declare general purpose timer registers

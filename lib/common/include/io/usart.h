@@ -1,5 +1,10 @@
-#ifndef _STM32F1COMMON_USART_H
-#define _STM32F1COMMON_USART_H
+/*
+2018 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+#ifndef _COMMON_USART_H
+#define _COMMON_USART_H
 
 /* RM0008 figure 1, figure 8, figure 11 */
 /*

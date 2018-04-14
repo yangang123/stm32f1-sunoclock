@@ -1,5 +1,10 @@
-#ifndef _STM32F1COMMON_CORTEXM_H
-#define _STM32F1COMMON_CORTEXM_H
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+#ifndef _COMMON_CORTEXM_H
+#define _COMMON_CORTEXM_H
 
 #define cortexm_barrier_datasync() __asm("dsb")
 

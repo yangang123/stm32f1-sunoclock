@@ -1,5 +1,10 @@
-#ifndef _STM32F1COMMON_PWR_H
-#define _STM32F1COMMON_PWR_H
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+#ifndef _COMMON_PWR_H
+#define _COMMON_PWR_H
 
 /* clock source: SYSCLK --> AHB -- > APB1 (36Mhz max) --> PWR */ /* RM0008 figure 8, figure 11, 7.3.8 */
 

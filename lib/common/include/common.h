@@ -1,5 +1,10 @@
-#ifndef _STM32F1COMMON_COMMON_H
-#define _STM32F1COMMON_COMMON_H
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
+#ifndef _COMMON_COMMON_H
+#define _COMMON_COMMON_H
 
 #define _32 long
 #define _16 short
@@ -25,6 +30,8 @@ typedef unsigned _32 size;
 #undef _32
 #undef _16
 #undef _8
+
+#define NULL 0
 
 #endif
 
