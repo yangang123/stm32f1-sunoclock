@@ -1,3 +1,8 @@
+/*
+2017 David DiPaola
+licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
+*/
+
 #include <cortexm.h>
 #include <nvic.h>
 #include <io/rcc.h>
