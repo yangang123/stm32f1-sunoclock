@@ -3,8 +3,8 @@
 licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
 */
 
-#ifndef _COMMON_EXTI_H
-#define _COMMON_EXTI_H
+#ifndef _COMMON_IO_EXTI_H
+#define _COMMON_IO_EXTI_H
 
 /* RM0008 10.3.7 */
 struct __attribute__ ((__packed__)) exti {

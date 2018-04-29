@@ -159,7 +159,7 @@ main(void) {
 	/*_setup_pwm_timer1();*/
 	rtc_init(rtc_clksrc_LSE);
 	rtc_alarm_handler_set(&_rtc_alarm_handler);
-	usart_init(USART1, APB2_FREQ, USART1_BAUD);
+	usart_init_USART1(APB2_FREQ, USART1_BAUD);
 	cortexm_interrupt_enable();
 	usart_write_str_nl(USART1, "init complete");
 

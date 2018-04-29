@@ -7,7 +7,7 @@ licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/
 #define _USART_H
 
 void
-usart_init(struct usart * urt, size clkspd, size baud);
+usart_init_USART1(size clkspd, size baud);
 
 void
 usart_write_chr(struct usart * urt, u8 value);

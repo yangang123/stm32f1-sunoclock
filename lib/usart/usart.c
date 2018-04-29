@@ -8,30 +8,27 @@ licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/
 #include <io/usart.h>
 
 void
-usart_init(struct usart * urt, size clkspd, size baud) {
-	if (urt == USART1) {
-		/* RM0008 figure 1, figure 8, figure 11 */
-		RCC->APB2ENR |= (rcc_APB2ENR_USART1EN | rcc_APB2ENR_IOPAEN | rcc_APB2ENR_AFIOEN);
+usart_init_USART1(size clkspd, size baud) {
+	/* RM0008 figure 1, figure 8, figure 11 */
+	RCC->APB2ENR |= (rcc_APB2ENR_USART1EN | rcc_APB2ENR_IOPAEN | rcc_APB2ENR_AFIOEN);
 
-		/* RM0008 table 24, table 54 */
-		u32 crh = GPIOA->CRH;
-		u32 odr = GPIOA->ODR;
-		/* set TX pin to alternate function push-pull at 2Mhz */ /* RM0008 table 54 */
-		crh = (crh & ~(gpio_CRH_CNF9_MASK )) | gpio_CRH_CNF9_OUT_AFPP;
-		crh = (crh & ~(gpio_CRH_MODE9_MASK)) | gpio_CRH_MODE9_OUT_2MHZ;
-		/* set RX pin to input with pull-up */ /* RM0008 table 54 */
-		crh = (crh & ~(gpio_CRH_CNF10_MASK )) | gpio_CRH_CNF10_IN_PUPD;
-		crh = (crh & ~(gpio_CRH_MODE10_MASK)) | gpio_CRH_MODE10_IN;
-		odr |= (1 << 10);
-		/* done */
-		GPIOA->CRH = crh;
-		GPIOA->ODR = odr;
-	}
-	/* TODO other USARTs */
+	/* RM0008 table 24, table 54 */
+	u32 crh = GPIOA->CRH;
+	u32 odr = GPIOA->ODR;
+	/* set TX pin to alternate function push-pull at 2Mhz */ /* RM0008 table 54 */
+	crh = (crh & ~(gpio_CRH_CNF9_MASK )) | gpio_CRH_CNF9_OUT_AFPP;
+	crh = (crh & ~(gpio_CRH_MODE9_MASK)) | gpio_CRH_MODE9_OUT_2MHZ;
+	/* set RX pin to input with pull-up */ /* RM0008 table 54 */
+	crh = (crh & ~(gpio_CRH_CNF10_MASK )) | gpio_CRH_CNF10_IN_PUPD;
+	crh = (crh & ~(gpio_CRH_MODE10_MASK)) | gpio_CRH_MODE10_IN;
+	odr |= (1 << 10);
+	/* done */
+	GPIOA->CRH = crh;
+	GPIOA->ODR = odr;
 
-	urt->BRR = usart_BRR_MACRO(clkspd, baud);
+	USART1->BRR = usart_BRR_MACRO(clkspd, baud);
 
-	urt->CR1 |= (usart_CR1_UE | usart_CR1_TE | usart_CR1_RE);
+	USART1->CR1 |= (usart_CR1_UE | usart_CR1_TE | usart_CR1_RE);
 }
 
 void

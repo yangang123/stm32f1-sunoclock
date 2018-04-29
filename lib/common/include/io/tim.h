@@ -3,8 +3,10 @@
 licensed under CC0 (public domain, see https://creativecommons.org/publicdomain/zero/1.0/)
 */
 
-#ifndef _COMMON_TIM_H
-#define _COMMON_TIM_H
+#ifndef _COMMON_IO_TIM_H
+#define _COMMON_IO_TIM_H
+
+#include <feature/tim.h>
 
 /* RM0008 figure 8, figure 11 */ 
 /*
@@ -61,30 +63,46 @@ static const u32 tim_BDTR_MOE = (1 << 15);  /* Main Output Enable */
 /* TODO other BDTR bits */
 
 /* RM0008 table 3 */
-#if (defined(MCU_LINE_F103) || defined(MCU_LINE_F105) || defined(MCU_LINE_F107))  /* RM0008 table 1, RM0008 14 */
+#if defined(FEATURE_TIM1)
 static struct tim_adv * const tim_TIM1  = (void *)0x40012C00;
 #endif
-#if (defined(MCU_LINE_F103) && (defined(MCU_DENSITY_HIGH) || defined(MCU_DENSITY_XL)))  /* RM0008 table 1, RM0008 14 */
+#if defined(FEATURE_TIM8)
 static struct tim_adv * const tim_TIM8  = (void *)0x40013400;  /* TODO confirm */
 #endif
+#if defined(FEATURE_TIM2)
 static struct tim_gp  * const tim_TIM2  = (void *)0x40000000;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM3)
 static struct tim_gp  * const tim_TIM3  = (void *)0x40000400;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM4)
 static struct tim_gp  * const tim_TIM4  = (void *)0x40000800;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM5)
 static struct tim_gp  * const tim_TIM5  = (void *)0x40000C00;  /* TODO confirm */
-#if (defined(MCU_DENSITY_XL))  /* RM0008 table 1, RM0008 16 */
+#endif
+#if defined(FEATURE_TIM9)
 static struct tim_gp  * const tim_TIM9  = (void *)0x40014C00;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM10)
 static struct tim_gp  * const tim_TIM10 = (void *)0x40015000;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM11)
 static struct tim_gp  * const tim_TIM11 = (void *)0x40015400;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM12)
 static struct tim_gp  * const tim_TIM12 = (void *)0x40001800;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM13)
 static struct tim_gp  * const tim_TIM13 = (void *)0x40001C00;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM14)
 static struct tim_gp  * const tim_TIM14 = (void *)0x40002000;  /* TODO confirm */
 #endif
-#if (  \
-    ((defined(MCU_LINE_F101) || defined(MCU_LINE_F103)) && (defined(MCU_DENSITY_HIGH) || defined(MCU_DENSITY_XL)))  \
-    || defined(MCU_LINE_F105)  \
-    || defined(MCU_LINE_F107)  \
-)  /* RM0008 table 1, RM0008 17 */
+#if defined(FEATURE_TIM6)
 static struct tim_bas * const tim_TIM6  = (void *)0x40001000;  /* TODO confirm */
+#endif
+#if defined(FEATURE_TIM7)
 static struct tim_bas * const tim_TIM7  = (void *)0x40001400;  /* TODO confirm */
 #endif
 

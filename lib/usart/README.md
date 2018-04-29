@@ -1,5 +1,5 @@
 # usart
-stm32f1 usart library
+stm32f1 universal synchronous/asynchronous receiver/transmitter library
 
 [github](https://github.com/DavidDiPaola/stm32f1-usart)
 
