@@ -50,48 +50,49 @@ OPENOCD_FLAGS ?= \
 .PHONY: all
 all: $(BIN)
 
-.PHONY: strip
-strip: $(BIN)
-	$(STRIP) --strip-all $<
-
 .PHONY: debug
 debug:
-	$(MAKE) CPP_FLAGS_DEBUG="-D DEBUG" GLD_FLAGS_DEBUG="--print-map --print-gc-sections --print-memory-usage"
+	@$(MAKE) CPP_FLAGS_DEBUG="-D DEBUG" GLD_FLAGS_DEBUG="--print-map --print-gc-sections --print-memory-usage"
 
 .PHONY: dump
 dump: $(BIN)
-	$(OBJDUMP) --disassemble $^
+	@$(OBJDUMP) --disassemble $^
+	@echo [OBJDUMP] $^
 
 .PHONY: size
 size: $(BIN)
-	$(SIZE) --format=SysV $^
+	@$(SIZE) --format=SysV $^
+	@echo [SIZE] $^
 
 .PHONY: flash
 flash: $(BIN)
-	$(OPENOCD) $(OPENOCD_FLAGS) --command "program $< verify reset exit"
+	@$(OPENOCD) $(OPENOCD_FLAGS) --command "program $< verify reset exit"
+	@echo [FLASH] $<
 
 .PHONY: run-debug-server
 run-debug-server:
-	$(OPENOCD) $(OPENOCD_FLAGS)
+	@$(OPENOCD) $(OPENOCD_FLAGS)
+	@echo [DEBUG-SERVER]
 
 .PHONY: run-debug-client
 run-debug-client: $(COMMON_DIR)/gdbinit $(BIN)
-	$(GDB) $(GDB_FLAGS) -x $(COMMON_DIR)/gdbinit $(BIN)
+	@$(GDB) $(GDB_FLAGS) -x $(COMMON_DIR)/gdbinit $(BIN)
+	@echo [DEBUG-CLIENT] $(BIN)
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJ)
-
-.PHONY: distclean
-distclean: clean
-	rm -rf $(BIN)
+	@rm -rf $(OBJ) $(BIN)
+	@echo [RM] $(OBJ) $(BIN)
 
 .s.o:
-	$(GCC) $(GCC_FLAGS) -o $@ -c $<
+	@$(GCC) $(GCC_FLAGS) -o $@ -c $<
+	@echo [CC] $<
 
 .c.o:
-	$(GCC) $(GCC_FLAGS) -o $@ -c $<
+	@$(GCC) $(GCC_FLAGS) -o $@ -c $<
+	@echo [CC] $<
 
 $(BIN): $(COMMON_SRC_LDS) $(OBJ)
-	$(GLD) $(GLD_FLAGS) -T $(COMMON_SRC_LDS) -o $@ $(OBJ)
+	@$(GLD) $(GLD_FLAGS) -T $(COMMON_SRC_LDS) -o $@ $(OBJ)
+	@echo [LD] -o $@ $(OBJ)
 
